@@ -19,7 +19,6 @@ int main()
     short mapwidth = 20;
     short mapheight = 20;
     double* p_move;
-    //log.open("log.txt");
     console::Console window(WIDTH, HEIGHT, "Game window");
     std::wstring map;
     map += L"####################";
@@ -28,10 +27,10 @@ int main()
     map += L"#                  #";
     map += L"#                  #";
     map += L"#                  #";
-    map += L"#                  #";
-    map += L"#                  #";
-    map += L"#                  #";
-    map += L"#                  #";
+    map += L"#     #  ####      #";
+    map += L"#     #     #      #";
+    map += L"#     #     #      #";
+    map += L"#     #######      #";
     map += L"#                  #";
     map += L"#                  #";
     map += L"##########         #";
@@ -43,26 +42,25 @@ int main()
     map += L"#                  #";
     map += L"####################";
     window.createConsole();
-    while (1)
+    while (1) //Main loop
     {
         for (double i = deg - fov / 2; i < deg + fov / 2; i += fov / WIDTH)
         {
             bool onwall = false;
             distancetowall = 0.0;
-            while (!onwall)
+            while (!onwall) //while a wall has not been hit, increment lookup distance
             {
                 points = window.moveByAngle(playerx, playery, distancetowall, i, fov);
                 if (map[static_cast<int64_t>(points[1]) * mapwidth + static_cast<int64_t>(points[0])] == '#')
                     onwall = true;
-                if (distancetowall >= visibility)
+                if (distancetowall >= visibility) //If distance to wall exceeds limit, exit
                 {
                     distancetowall = (double)HEIGHT;
                     break;
                 }
                 distancetowall += 0.1;
             }
-            //log << distancetowall << ' ' << ceiling << "\n";
-            if (int(distancetowall))
+            if (int(distancetowall)) //Define shading for a line if distance is nonzero
             {
                 lineheight = HEIGHT / (distancetowall);
                 ceiling = (HEIGHT - lineheight) / 2;
@@ -76,11 +74,11 @@ int main()
                 for (int j = 0; j < HEIGHT - 1; j++)
                 {
                     if (j < HEIGHT - ceiling && j > ceiling)
-                        window.fillCell((short)rayx, j, shade);
+                        window.fillCell((short)rayx, j, shade); //draw wall
                     else if (j <= (int)ceiling)
-                        window.fillCell((short)rayx, j, ' ');
+                        window.fillCell((short)rayx, j, ' '); //draw sky
                     else
-                        window.fillCell((short)rayx, j, 0x2588, 2);
+                        window.fillCell((short)rayx, j, 0x2588, 2); //draw floor 
                 }
             }
             else
@@ -90,6 +88,7 @@ int main()
             }
             
         }
+        //Reacting to user input
         if (GetAsyncKeyState(VK_LEFT))
             deg += 0.4;
         if (GetAsyncKeyState(VK_RIGHT))
@@ -117,6 +116,5 @@ int main()
         window.updateScreen(false);
     }
     window.releaseMemory();
-    //log.close();
     return 0;
 }
