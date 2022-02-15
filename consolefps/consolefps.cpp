@@ -41,79 +41,80 @@ int main()
     map += L"#                  #";
     map += L"#                  #";
     map += L"####################";
-    window.createConsole();
-    while (1) //Main loop
+    if (window.createConsole()) //Only start drawing if console has been created
     {
-        for (double i = deg - fov / 2; i < deg + fov / 2; i += fov / WIDTH)
+        while (1) //Main loop
         {
-            bool onwall = false;
-            distancetowall = 0.0;
-            while (!onwall) //while a wall has not been hit, increment lookup distance
+            for (double i = deg - fov / 2; i < deg + fov / 2; i += fov / WIDTH)
             {
-                points = window.moveByAngle(playerx, playery, distancetowall, i, fov);
-                if (map[static_cast<int64_t>(points[1]) * mapwidth + static_cast<int64_t>(points[0])] == '#')
-                    onwall = true;
-                if (distancetowall >= visibility) //If distance to wall exceeds limit, exit
+                bool onwall = false;
+                distancetowall = 0.0;
+                while (!onwall) //while a wall has not been hit, increment lookup distance
                 {
-                    distancetowall = (double)HEIGHT;
-                    break;
+                    points = window.moveByAngle(playerx, playery, distancetowall, i, fov);
+                    if (map[static_cast<int64_t>(points[1]) * mapwidth + static_cast<int64_t>(points[0])] == '#')
+                        onwall = true;
+                    if (distancetowall >= visibility) //If distance to wall exceeds limit, exit
+                    {
+                        distancetowall = (double)HEIGHT;
+                        break;
+                    }
+                    distancetowall += 0.1;
                 }
-                distancetowall += 0.1;
-            }
-            if (int(distancetowall)) //Define shading for a line if distance is nonzero
-            {
-                lineheight = HEIGHT / (distancetowall);
-                ceiling = (HEIGHT - lineheight) / 2;
-                rayx = (i - deg + fov / 2) / (fov / WIDTH);
-                if (distancetowall <= 4.0)
-                    shade = 0x2588;
-                else if (distancetowall > 4.0 && distancetowall <= 8.0)
-                    shade = 0x2593;
-                else
-                    shade = 0x2592;
-                for (int j = 0; j < HEIGHT - 1; j++)
+                if (int(distancetowall)) //Define shading for a line if distance is nonzero
                 {
-                    if (j < HEIGHT - ceiling && j > ceiling)
-                        window.fillCell((short)rayx, j, shade); //draw wall
-                    else if (j <= (int)ceiling)
-                        window.fillCell((short)rayx, j, ' '); //draw sky
+                    lineheight = HEIGHT / (distancetowall);
+                    ceiling = (HEIGHT - lineheight) / 2;
+                    rayx = (i - deg + fov / 2) / (fov / WIDTH);
+                    if (distancetowall <= 4.0)
+                        shade = 0x2588;
+                    else if (distancetowall > 4.0 && distancetowall <= 8.0)
+                        shade = 0x2593;
                     else
-                        window.fillCell((short)rayx, j, 0x2588, 2); //draw floor 
+                        shade = 0x2592;
+                    for (int j = 0; j < HEIGHT - 1; j++)
+                    {
+                        if (j < HEIGHT - ceiling && j > ceiling)
+                            window.fillCell((short)rayx, j, shade); //draw wall
+                        else if (j <= (int)ceiling)
+                            window.fillCell((short)rayx, j, ' '); //draw sky
+                        else
+                            window.fillCell((short)rayx, j, 0x2588, 2); //draw floor 
+                    }
+                }
+                else
+                {
+                    for (int j = 0; j < HEIGHT - 1; j++)
+                        window.fillCell((short)rayx, j, ' ');
                 }
             }
-            else
+            //Reacting to user input
+            if (GetAsyncKeyState(VK_LEFT))
+                deg += 0.4;
+            if (GetAsyncKeyState(VK_RIGHT))
+                deg -= 0.4;
+            if (GetAsyncKeyState(0x57))
             {
-                for (int j = 0; j < HEIGHT - 1; j++)
-                    window.fillCell((short)rayx, j, ' ');
+                p_move = window.moveByAngle(playerx, playery, 0.01, deg, fov);
+                if (p_move[0] > 0 && p_move[0] < mapwidth - 1 && p_move[1] > 0 && p_move[1] < mapheight - 1)
+                {
+                    playerx = p_move[0];
+                    playery = p_move[1];
+                }
             }
-            
-        }
-        //Reacting to user input
-        if (GetAsyncKeyState(VK_LEFT))
-            deg += 0.4;
-        if (GetAsyncKeyState(VK_RIGHT))
-            deg -= 0.4;
-        if (GetAsyncKeyState(0x57))
-        {
-            p_move = window.moveByAngle(playerx, playery, 0.01, deg, fov);
-            if (p_move[0] > 0 && p_move[0] < mapwidth-1 && p_move[1] > 0 && p_move[1] < mapheight-1)
+            if (GetAsyncKeyState(0x53))
             {
-                playerx = p_move[0];
-                playery = p_move[1];
+                p_move = window.moveByAngle(playerx, playery, 0.01, deg + 180.0, fov);
+                if (p_move[0] > 0 && p_move[0] < mapwidth - 1 && p_move[1] > 0 && p_move[1] < mapheight - 1)
+                {
+                    playerx = p_move[0];
+                    playery = p_move[1];
+                }
             }
+            if (GetAsyncKeyState(VK_ESCAPE))
+                break;
+            window.updateScreen(false);
         }
-        if (GetAsyncKeyState(0x53))
-        {
-            p_move = window.moveByAngle(playerx, playery, 0.01, deg+180.0, fov);
-            if (p_move[0] > 0 && p_move[0] < mapwidth - 1 && p_move[1] > 0 && p_move[1] < mapheight - 1)
-            {
-                playerx = p_move[0];
-                playery = p_move[1];
-            }
-        }
-        if (GetAsyncKeyState(VK_ESCAPE))
-            break;
-        window.updateScreen(false);
     }
     window.releaseMemory();
     return 0;
