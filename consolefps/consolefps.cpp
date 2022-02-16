@@ -1,10 +1,13 @@
 #include "consolegraphics.h"
+#include <fstream>
+#include <string>
 
 #define WIDTH 180
 #define HEIGHT 80
 
 int main()
 {
+    bool fetchfail = false;
     double* points;
     wchar_t shade = 0x2588;
     double distancetowall = 0;
@@ -20,28 +23,16 @@ int main()
     short mapheight = 20;
     double* p_move;
     console::Console window(WIDTH, HEIGHT, "Game window");
-    std::wstring map;
-    map += L"####################";
-    map += L"#                  #";
-    map += L"#                  #";
-    map += L"#                  #";
-    map += L"#                  #";
-    map += L"#                  #";
-    map += L"#     #  ####      #";
-    map += L"#     #     #      #";
-    map += L"#     #     #      #";
-    map += L"#     #######      #";
-    map += L"#                  #";
-    map += L"#                  #";
-    map += L"##########         #";
-    map += L"#       ##         #";
-    map += L"#       ##         #";
-    map += L"#       ##         #";
-    map += L"#                  #";
-    map += L"#                  #";
-    map += L"#                  #";
-    map += L"####################";
-    if (window.createConsole()) //Only start drawing if console has been created
+    std::string tmp;
+    std::string map;
+    std::ifstream file;
+    file.open("map.txt");
+    //fetching map from file
+    while (getline(file, tmp))
+    {
+        map += tmp;
+    }
+    if (window.createConsole() && !fetchfail) //Only start drawing if console has been created
     {
         while (1) //Main loop
         {
@@ -59,7 +50,7 @@ int main()
                         distancetowall = (double)HEIGHT;
                         break;
                     }
-                    distancetowall += 0.1;
+                    distancetowall += 0.01;
                 }
                 if (int(distancetowall)) //Define shading for a line if distance is nonzero
                 {
@@ -117,5 +108,6 @@ int main()
         }
     }
     window.releaseMemory();
+    file.close();
     return 0;
 }
