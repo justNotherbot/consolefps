@@ -2,14 +2,39 @@
 #include <fstream>
 #include <string>
 
-#define WIDTH 180
-#define HEIGHT 80
+#define WIDTH 360
+#define HEIGHT 180
+
+double testLine(double x, double y, double x1, double y1, double xtest)
+{
+    double a, testy;
+    if (x != x1)
+    {
+        double b;
+        a = (y1 - y) / (x1 - x);
+        b = y - a * x;
+        testy = a * xtest + b;
+        if (testy > max(y, y1) || testy < min(y, y1))
+            return -1;
+        return testy;
+    }
+    else
+    {
+        if (x != xtest)
+            return -1;
+        else
+            return y;
+    }
+}
 
 int main()
 {
-    bool fetchfail = false;
+    double testy = 0;
     double* points;
     wchar_t shade = 0x2588;
+    short pcolor = 0x000F;
+    double texx = 0.0;
+    double texy = 0.0;
     double distancetowall = 0;
     double ceiling = 0.0;
     double lineheight = 0.0;
@@ -21,7 +46,20 @@ int main()
     double fov = 90.0;
     short mapwidth = 20;
     short mapheight = 20;
+    short texturewidth = 10;
     double* p_move;
+    std::string texture;
+    texture += "bbbbbbbbbb";
+    texture += "baaaaaaaab";
+    texture += "baaaaaaaab";
+    texture += "baaaaaaaab";
+    texture += "baaaaaaaab";
+    texture += "baaaaaaaab";
+    texture += "baaaaaaaab";
+    texture += "baaaaaaaab";
+    texture += "baaaaaaaab";
+    texture += "baaaaaaaab";
+    texture += "bbbbbbbbbbb";
     console::Console window(WIDTH, HEIGHT, "Game window");
     std::string tmp;
     std::string map;
@@ -32,7 +70,7 @@ int main()
     {
         map += tmp;
     }
-    if (window.createConsole() && !fetchfail) //Only start drawing if console has been created
+    if (window.createConsole()) //Only start drawing if console has been created
     {
         while (1) //Main loop
         {
@@ -44,7 +82,21 @@ int main()
                 {
                     points = window.moveByAngle(playerx, playery, distancetowall, i, fov);
                     if (map[static_cast<int64_t>(points[1]) * mapwidth + static_cast<int64_t>(points[0])] == '#')
+                    {
+                        if((int)points[0] - playerx > 0) //If we've hit wall right of where the player is, consider x of the ray without decimal 
+                            testy = testLine(playerx, playery, points[0], points[1], int(points[0]));
+                        else //Otherwise, consider rounded x of the ray because we always want to stay within the bounds of the line player position - ray position
+                            testy = testLine(playerx, playery, points[0], points[1], std::round(points[0]));
+                        if ((int)testy == (int)points[1])
+                        {
+                            texx = std::round((points[1] - (int)points[1]) * texturewidth); // If we've hit left or right of the cell, use y for sampling
+                        }
+                        else
+                        {
+                            texx = std::round((points[0] - (int)points[0]) * texturewidth); // If we've hit top or bottom of the cell, use x for sampling
+                        }
                         onwall = true;
+                    } 
                     if (distancetowall >= visibility) //If distance to wall exceeds limit, exit
                     {
                         distancetowall = (double)HEIGHT;
@@ -52,7 +104,7 @@ int main()
                     }
                     distancetowall += 0.01;
                 }
-                if (int(distancetowall)) //Define shading for a line if distance is nonzero
+                if (int(distancetowall)) //Define shading and color for a line if distance is nonzero
                 {
                     lineheight = HEIGHT / (distancetowall);
                     ceiling = (HEIGHT - lineheight) / 2;
@@ -66,7 +118,15 @@ int main()
                     for (int j = 0; j < HEIGHT - 1; j++)
                     {
                         if (j < HEIGHT - ceiling && j > ceiling)
-                            window.fillCell((short)rayx, j, shade); //draw wall
+                        {
+                            //Do sampling for every pixel
+                            texy = (j - ceiling) * (texturewidth/lineheight);
+                            if (texture[static_cast<int64_t>(std::round(texy)) * texturewidth + static_cast<int64_t>(texx)] == 'b')
+                                pcolor = 3;
+                            else
+                                pcolor = 6;
+                            window.fillCell((short)rayx, j, shade, pcolor); //draw wall
+                        } 
                         else if (j <= (int)ceiling)
                             window.fillCell((short)rayx, j, ' '); //draw sky
                         else
@@ -81,9 +141,9 @@ int main()
             }
             //Reacting to user input
             if (GetAsyncKeyState(VK_LEFT))
-                deg += 0.4;
+                deg += 0.9;
             if (GetAsyncKeyState(VK_RIGHT))
-                deg -= 0.4;
+                deg -= 0.9;
             if (GetAsyncKeyState(0x57))
             {
                 p_move = window.moveByAngle(playerx, playery, 0.01, deg, fov);
