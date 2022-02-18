@@ -46,20 +46,30 @@ int main()
     double fov = 90.0;
     short mapwidth = 20;
     short mapheight = 20;
-    short texturewidth = 10;
+    short texturewidth = 20;
     double* p_move;
     std::string texture;
-    texture += "bbbbbbbbbb";
-    texture += "baaaaaaaab";
-    texture += "baaaaaaaab";
-    texture += "baaaaaaaab";
-    texture += "baaaaaaaab";
-    texture += "baaaaaaaab";
-    texture += "baaaaaaaab";
-    texture += "baaaaaaaab";
-    texture += "baaaaaaaab";
-    texture += "baaaaaaaab";
-    texture += "bbbbbbbbbbb";
+    texture += "bbbabbbabbbabbbabbba";
+    texture += "bbbabbbabbbabbbabbba";
+    texture += "aaaaaaaaaaaaaaaaaaaa";
+    texture += "bbbabbbabbbabbbabbba";
+    texture += "bbbabbbabbbabbbabbba";
+    texture += "aaaaaaaaaaaaaaaaaaaa";
+    texture += "bbbabbbabbbabbbabbba";
+    texture += "bbbabbbabbbabbbabbba";
+    texture += "aaaaaaaaaaaaaaaaaaaa";
+    texture += "bbbabbbabbbabbbabbba";
+    texture += "bbbabbbabbbabbbabbba";
+    texture += "aaaaaaaaaaaaaaaaaaaa";
+    texture += "bbbabbbabbbabbbabbba";
+    texture += "bbbabbbabbbabbbabbba";
+    texture += "aaaaaaaaaaaaaaaaaaaa";
+    texture += "bbbabbbabbbabbbabbba";
+    texture += "bbbabbbabbbabbbabbba";
+    texture += "aaaaaaaaaaaaaaaaaaaa";
+    texture += "bbbabbbabbbabbbabbba";
+    texture += "bbbabbbabbbabbbabbba";
+    texture += "aaaaaaaaaaaaaaaaaaaa";
     console::Console window(WIDTH, HEIGHT, "Game window");
     std::string tmp;
     std::string map;
@@ -89,11 +99,11 @@ int main()
                             testy = testLine(playerx, playery, points[0], points[1], std::round(points[0]));
                         if ((int)testy == (int)points[1])
                         {
-                            texx = std::round((points[1] - (int)points[1]) * texturewidth); // If we've hit left or right of the cell, use y for sampling
+                            texx = (points[1] - (int)points[1]) * texturewidth; // If we've hit left or right of the cell, use y for sampling
                         }
                         else
                         {
-                            texx = std::round((points[0] - (int)points[0]) * texturewidth); // If we've hit top or bottom of the cell, use x for sampling
+                            texx = (points[0] - (int)points[0]) * texturewidth; // If we've hit top or bottom of the cell, use x for sampling
                         }
                         onwall = true;
                     } 
@@ -117,14 +127,14 @@ int main()
                         shade = 0x2592;
                     for (int j = 0; j < HEIGHT - 1; j++)
                     {
-                        if (j < HEIGHT - ceiling && j > ceiling)
+                        if (j < HEIGHT - ceiling && j >= ceiling)
                         {
                             //Do sampling for every pixel
                             texy = (j - ceiling) * (texturewidth/lineheight);
                             if (texture[static_cast<int64_t>(std::round(texy)) * texturewidth + static_cast<int64_t>(texx)] == 'b')
-                                pcolor = 3;
+                                pcolor = 12;
                             else
-                                pcolor = 6;
+                                pcolor = 14;
                             window.fillCell((short)rayx, j, shade, pcolor); //draw wall
                         } 
                         else if (j <= (int)ceiling)
