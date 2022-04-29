@@ -174,6 +174,7 @@ int main()
             }
             if (GetAsyncKeyState(VK_ESCAPE))
                 break;
+            window.drawLine(0, 0, 10, 10);
             window.updateScreen(false);
         }
     }
