@@ -1,5 +1,9 @@
+//This is a modified console graphics header file specifically for this application
+
 #include <iostream>
 #include <math.h>
+#include <string>
+#include <fstream>
 #include <windows.h>
 
 namespace console
@@ -61,6 +65,10 @@ namespace console
             dsp[y * width + x].Char.UnicodeChar = s;
             dsp[y * width + x].Attributes = c;
         }
+        short getAttribute(short x, short y) //Returns color of a cell
+        {
+            return dsp[y * width + x].Attributes;
+        }
         void updateScreen(bool refresh = true) //disable refresh for precision
         {
             WriteConsoleOutput(sobuf, dsp, { width, height }, { 0, 0 }, &coords);
@@ -115,6 +123,46 @@ namespace console
             }
             fillCell((short)h + r - 1, (short)v, s, c);
         }
+        void drawSprite(short x, short y, double scale, std::string texture, double t_width, double t_height, double d_buf[], double dist) //Draw sprite given coordinates of its center and scale
+        {
+            short color = 0;
+            t_width = t_width * scale;
+            t_height = t_height * scale;
+            for (short j = x - short(t_width / 2); j < x + short(t_width / 2); j++)
+            {
+                if (d_buf[j] > dist && j >= 0 && j < width)
+                {
+                    for (short i = y - short(t_height / 2); i < y + short(t_height / 2); i++)
+                    {
+                        double norm_y = (i - y + t_height / 2) / (t_height);
+                        double norm_x = (j - x + t_width / 2) / (t_width);
+                        int id = static_cast<int64_t>(t_height * norm_y / scale) * (t_width / scale) + static_cast<int64_t>(t_width * norm_x / scale);
+                        if (texture[id] != ' ')
+                        {
+                            if (texture[id] == 'b')
+                                color = 12;
+                            else if (texture[id] == 'a')
+                                color = 14;
+                            else if (texture[id] == 'r')
+                                color = 4;
+                            else if (texture[id] == 'g')
+                                color = 2;
+                            else if (texture[id] == 'c')
+                                color = 128;
+                            else
+                                color = 7;
+                            fillCell(j, i, 0x2588, color);
+                        }
+                    }
+                } 
+            }
+        }
+		double project(double a1, double b1, double a, double b, double l, double fov)
+        {
+            double xprojected = (l * (a - a1)) / (2 * tan(fov / 2) * (b - b1));
+            double result = a1 + xprojected;
+            return result;
+        }
         double* rotateLine(double x, double y, double x1, double y1, double ang)
         {
             double dist = sqrt((x1 - x) * (x1 - x) + (y1 - y) * (y1 - y)); //current hypothenuse
@@ -128,9 +176,9 @@ namespace console
             points[1] = y + std::round(opposite);
             return points;
         }
-        double* moveByAngle(double x, double y, double dist, double ang, double fov)
+        double* moveByAngle(double x, double y, double dist, double ang)
         {
-            double rad_ang = ang * 3.14159265 / 180.0 + fov;
+            double rad_ang = ang * 3.14159265 / 180.0;
             double points[2] = {0.0, 0.0};
             points[0] = x - cos(rad_ang) * dist;
             points[1] = y - sin(rad_ang) * dist;

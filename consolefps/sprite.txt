@@ -1,0 +1,27 @@
+        cc        
+       cccc       
+      cccccc      
+      aaaaaa      
+     aahaahaa     
+     aaaaaaaa     
+      aabbaa      
+       aaaa       
+       aaaa       
+cccccccccccccccccc
+cccccccccccccccccc
+ccc cccccccccc ccc
+ccc cchhhhhhcc ccc
+ccc ccccccchcc ccc
+ccc cccccchccc ccc
+ccc ccccchcccc ccc
+ccc cccchccccc ccc
+aaa ccchcccccc aaa
+    cchhhhhhcc    
+    cccccccccc    
+    ccc cc ccc    
+    ccc cc ccc    
+    ccc    ccc    
+    ccc    ccc    
+    ccc    ccc    
+    ccc    ccc    
+    ccc    ccc    
