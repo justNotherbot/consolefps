@@ -27,11 +27,11 @@ namespace console
             return s;
         }
     public:
-        Console(short a, short b, std::string c) //constructor
+        Console(short w, short h, std::string ti) //constructor
         {
-            width = a;
-            height = b;
-            title = c;
+            width = w;
+            height = h;
+            title = ti;
         }
         int createConsole() //returns 0 if something went wrong, 1 if console has been created successfully
         {
@@ -52,7 +52,7 @@ namespace console
             {
                 return 0;
             }
-            dsp = new CHAR_INFO[width * height];
+            dsp = new CHAR_INFO[width * height + 1];
             for (int i = 0; i < width * height; i++) //filling pointer with spaces so that nothing overlaps
             {
                 dsp[i].Char.UnicodeChar = L' ';

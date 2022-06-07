@@ -1,7 +1,7 @@
 #include "consolegraphics.h"
 
-#define WIDTH 360
-#define HEIGHT 180
+#define WIDTH 400
+#define HEIGHT 200
 
 double testLine(double x, double y, double x1, double y1, double xtest, bool bounds = true)
 {
@@ -57,7 +57,7 @@ int main()
     short mapheight = 20;
     short texturewidth = 20;
     double* p_move;
-    double depth_buffer[WIDTH] = { 0 };
+    double depth_buffer[WIDTH+1] = { 0 };
     std::string texture;
     std::string s_texture;
     Billboard billboard_t;
@@ -166,7 +166,7 @@ int main()
                             shade = 0x2593;
                         else
                             shade = 0x2592;
-                        for (int j = 0; j < HEIGHT - 1; j++)
+                        for (int j = 0; j < HEIGHT; j++)
                         {
                             if (j < HEIGHT - floor && j >= ceiling)
                             {
@@ -194,7 +194,7 @@ int main()
                     }
                     else
                     {
-                        for (int j = 0; j < HEIGHT - 1; j++)
+                        for (int j = 0; j < HEIGHT; j++)
                             window.fillCell((short)rayx, j, ' ');
                     }
                 }
